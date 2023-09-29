@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Leitner</title>
+  <style>body { padding: 0; margin: 0; }</style>
+  <script src="main.js"></script>
+  <script src="Temml-0.10.14/dist/temml.min.js"></script>
+</head>
+
+<body>
+  <pre id='elm'></pre>
+  <script>
+    const storage = window.localStorage;
+    const cards = storage.cards ? JSON.parse(storage.cards)
+          : [
+              {
+                  question:  "What is the dot product of this two vectors:\n"
+                      + "a = [ a 1 , a 2 , ⋯ , a n ] and "
+                      + "b = [ b 1 , b 2 , ⋯ , b n ] } ?",
+                  correctAnswer: {
+                      contentType : "MathFormula",
+                      value :  "a . b = \\sum_{i=1}^{n}a_ib_i = a_1b_1 + a_2b_2 + ... + a_nb_n"
+                  },
+                  rank: 0,
+                  nextReviewAt: Date.now() - 86400000
+              },
+              {
+                  question:  "Another question",
+                  correctAnswer: {
+                      contentType : "Raw",
+                      value :  "another answer"
+                  },
+                  rank: 5,
+                  nextReviewAt: Date.now() - 86400000
+              }
+          ];
+
+    var app =
+      Elm.Main.init(
+          {
+              node: document.getElementById('elm'),
+              flags: cards
+          }
+      );
+
+    app.ports.saveCards.subscribe(function(cards) {
+        console.log("save cards");
+        console.log(cards);
+        storage.cards = JSON.stringify(cards);
+    });
+
+    customElements.define(
+        'math-formula',
+        class extends HTMLElement {
+            // things required by Custom Elements
+            constructor() { super(); }
+            connectedCallback() { this.setTextContent(); }
+            attributeChangedCallback() { this.setTextContent(); }
+            static get observedAttributes() { return ['src']; }
+            
+            // Our function to set the textContent based on attributes.
+            setTextContent()
+            {
+                const src = this.getAttribute('src');
+                temml.render(src, this);
+            }
+        }
+    );
+  </script>
+</body>
+</html>
