@@ -537,10 +537,13 @@ homeView _ =
 manageQuestionView : Model -> E.Element Msg
 manageQuestionView model =
     let
-        headerBgColor = Bg.color (E.rgba255 128 157 193 0.5)
+        headerBgColor =
+            Bg.color (E.rgba255 128 157 193 0.5)
+
         headerStyle =
             [ E.padding 10
             , headerBgColor
+
             -- , F.color (E.rgb255 240 255 250)
             , E.centerY
             ]
@@ -551,7 +554,8 @@ manageQuestionView model =
     E.column [ E.width E.fill, E.spacing 10 ]
         [ E.table
             [ Bd.solid
-            , Bd.width 2            , E.centerX
+            , Bd.width 2
+            , E.centerX
             , Bg.color (E.rgb255 250 255 250)
             ]
             { data =
@@ -761,6 +765,16 @@ addQuestionView model =
                 , I.option MathFormula (E.text "latex")
                 ]
             }
+        , case model.newQuestion.contentType of
+            MathFormula ->
+                E.html <|
+                    node "math-formula"
+                        [ attribute "src" model.newQuestion.answer
+                        ]
+                        []
+
+            _ ->
+                E.none
         , E.row []
             [ button (UserInteracts SubmitNewCard) "Submit"
             , button (UserInteracts WantGoHome) "End"
